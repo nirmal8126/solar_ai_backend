@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from app.schemas.lead_schema import LeadCreate
 from app.database import supabase
 from app.ai import calculate_system_size, generate_ai_summary
@@ -103,4 +104,20 @@ def analyze_roof(lead_id: int):
         "roof_notes": "Placeholder estimate. Connect real roof AI later.",
     }
 
+@router.post("/{lead_id}/proposal/regenerate")
+def regenerate_proposal(lead_id: int):
+    lead = db.leads.find_one({"id": lead_id})
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
 
+    # Generate new proposal
+    pdf_path = generate_proposal_pdf(lead)
+
+    # Update lead record
+    db.leads.update({"id": lead_id}, {"$set": {"proposal_path": pdf_path}})
+
+    return {
+        "success": True,
+        "message": "Proposal regenerated",
+        "proposal_path": pdf_path
+    }
