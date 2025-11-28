@@ -29,7 +29,13 @@ def signup(payload: SignUpSchema, db: Session = Depends(get_db)):
     access = create_access_token({"sub": str(user.id)})
     refresh = create_refresh_token({"sub": str(user.id)})
 
-    return TokenResponse(access_token=access, refresh_token=refresh)
+    user_payload = {"id": user.id, "name": user.name, "email": user.email}
+
+    return TokenResponse(
+        access_token=access,
+        refresh_token=refresh,
+        user=user_payload,
+    )
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -45,4 +51,10 @@ def login(payload: LoginSchema, db: Session = Depends(get_db)):
     access = create_access_token({"sub": str(user.id)})
     refresh = create_refresh_token({"sub": str(user.id)})
 
-    return TokenResponse(access_token=access, refresh_token=refresh)
+    user_payload = {"id": user.id, "name": user.name, "email": user.email}
+
+    return TokenResponse(
+        access_token=access,
+        refresh_token=refresh,
+        user=user_payload,
+    )
