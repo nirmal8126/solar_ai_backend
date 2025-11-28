@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from app.routers import health, leads, chat
+from app.auth.router import router as auth_router
+app.include_router(auth_router, prefix="/auth")
 
 app = FastAPI(title="Solar AI Backend")
 
